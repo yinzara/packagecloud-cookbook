@@ -65,8 +65,8 @@ def install_rpm
   
   config_file = get(base_url_endpoint, install_endpoint_params).body.chomp
   base_url    = config_file.match(/baseurl=(.*)/)[1]
-  query       = base_url.match(/?(.*)\//)[1]
-  query       = query.replace('&amp;','&') unless query.nil?
+  query       = base_url.match(/\?(.*)\//)
+  query       = query[1].replace('&amp;','&') unless query.nil?
   base_url    = base_url.gsub(/\?^[\/]*\//,'/')
   base_url    = URI.parse(base_url)
   base_url.query = query
