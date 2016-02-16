@@ -62,10 +62,15 @@ def install_rpm
     base_url_endpoint.user     = new_resource.master_token
     base_url_endpoint.password = ''
   end
-
+  
   config_file = get(base_url_endpoint, install_endpoint_params).body.chomp
-  base_url    = URI.parse(config_file.split("\n").select{ |s| s =~ /baseurl/ }[0].split("=")[1])
-
+  base_url    = config_file.match(/baseurl=(.*)/)[1]
+  query       = base_url.match(/?(.*)\//)[1]
+  query       = query.replace('&amp;','&') unless query.nil?
+  base_url    = base_url.gsub(/\?^[\/]*\//,'/')
+  base_url    = URI.parse(base_url)
+  base_url.query = query
+  
   Chef::Log.debug("#{new_resource.name} rpm base url = #{base_url}")
 
   package 'pygpgme' do
